@@ -69,7 +69,7 @@ For example, to create a plugin for the multiplication operation:
 4. Open top-level src/CMakeLists.txt and add:
 
 ```cmake
-add_subdirectory("src/plugin3")
+add_subdirectory("src/plugin_multiplication")
 ```
 
 5. Re-build the project
