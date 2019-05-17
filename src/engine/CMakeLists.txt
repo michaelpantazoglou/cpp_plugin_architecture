@@ -11,14 +11,14 @@ add_library(${TARGET_NAME} SHARED
 # all plugin libs MUST be installed in a specific directory
 set_target_properties(${TARGET_NAME}
     PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY "~/Desktop/lib")
+    LIBRARY_OUTPUT_DIRECTORY "$ENV{HOME}/Desktop/calculator_engine/lib")
 
 target_include_directories(${TARGET_NAME} PRIVATE
     "../api")
 
 target_link_libraries(${TARGET_NAME}
     "dl"
-    "-Wl,-rpath=/home/michaelp/Desktop/plugins/"
+    "-Wl,-rpath=$ENV{HOME}/Desktop/calculator_engine/plugins/"
     "api"
 )
 

@@ -19,8 +19,9 @@ void PluginRegistry::initialize()
 {
   // By convention, the plugin registry expects that all plugin .so libraries 
   // are located under the specified folder
-  const std::string dirname = "~/Desktop/plugins";
-  DIR* dirp = opendir(dirname.c_str());
+  std::string homeDir(getenv("HOME"));
+  std::string pluginsDir = homeDir + "/Desktop/calculator_engine/plugins";
+  DIR* dirp = opendir(pluginsDir.c_str());
   struct dirent * dp;
 
   while ((dp = readdir(dirp)) != nullptr) {
