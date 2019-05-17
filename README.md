@@ -64,13 +64,13 @@ Calculator engine stopped
 For example, to create a plugin for the multiplication operation:
 
 1. Create a plugin_multiplication directory under src
-1. Create CMakeLists.txt, multiplication_plugin.h and multiplication_plugin.cpp under plugin_multiplication
-1. Implement those files in a similar way as e.g. the contents of plugin_addition folder
-1. Open top-level src/CMakeLists.txt and add:
+2. Create CMakeLists.txt, multiplication_plugin.h and multiplication_plugin.cpp under plugin_multiplication
+3. Implement those files in a similar way as e.g. the contents of plugin_addition folder
+4. Open top-level src/CMakeLists.txt and add:
 
 ```cmake
 add_subdirectory("src/plugin3")
 ```
 
-1. Re-build the project
-1. The plugin should be now available to the calculator engine
+5. Re-build the project
+6. The plugin should be now available to the calculator engine
