@@ -14,13 +14,13 @@ cmake ..
 make
 ```
 
-The following directories and contents will be created upon successful build:
+The following directories and contents should be created upon successful build:
 
 ```
-~/Desktop/lib/libapi.so
-~/Desktop/lib/libengine.so
-~/Desktop/plugins/libaddition_plugin.so
-~/Desktop/plugins/libsubtraction_plugin.so
+~/Desktop/calculator_engine/lib/libapi.so
+~/Desktop/calculator_engine/lib/libengine.so
+~/Desktop/calculator_engine/plugins/libaddition_plugin.so
+~/Desktop/calculator_engine/plugins/libsubtraction_plugin.so
 ```
 
 ## Demo Execution
