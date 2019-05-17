@@ -1,7 +1,7 @@
 #ifndef CALCULATOR_ENGINE_H
 #define CALCULATOR_ENGINE_H
 
-#include "plugin_registry.h"
+#include <string>
 
 /**
  * Implements a generic and extensible calculator engine.
@@ -50,13 +50,6 @@ public:
    * @return The operation result
    */
   double runOperation(std::string name, double operandA, double operandB);
-
-private:
-
-  /**
-   * The internal plugin registry.
-   */
-  PluginRegistry m_pluginRegistry;
 };
 
 #endif // CALCULATOR_ENGINE_H

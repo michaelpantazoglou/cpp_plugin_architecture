@@ -1,4 +1,5 @@
 #include "calculator_engine.h"
+#include "plugin_registry.h"
 #include <iostream>
 #include <assert.h>
 #include <dlfcn.h>
@@ -19,7 +20,7 @@ CalculatorEngine::CalculatorEngine()
  */
 void CalculatorEngine::start()
 {
-  m_pluginRegistry.initialize();
+  PluginRegistry::getSharedInstance().initialize();
   cout << "Calculator engine started" << endl;
 }
 
@@ -42,7 +43,7 @@ void CalculatorEngine::stop()
  */
 bool CalculatorEngine::isOperationSupported(std::string name)
 {
-  PluginEntry *pluginEntry = m_pluginRegistry.get("operation", name);
+  PluginEntry *pluginEntry = PluginRegistry::getSharedInstance().get("operation", name);
   if (!pluginEntry) {
     return false;
   }
@@ -64,7 +65,7 @@ bool CalculatorEngine::isOperationSupported(std::string name)
 double CalculatorEngine::runOperation(std::string name, double operandA, double operandB)
 {
   // Discover the requested operation plugin by name
-  PluginEntry *pluginEntry = m_pluginRegistry.get("operation", name);
+  PluginEntry *pluginEntry = PluginRegistry::getSharedInstance().get("operation", name);
   if (!pluginEntry) {
     return -1;
   }

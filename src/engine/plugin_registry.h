@@ -16,9 +16,16 @@ class PluginRegistry
 public:
   
   /**
-   * Constructor.
+   * (Signleton pattern)
+   * Returns the plugin registry shared instance.
+   * 
+   * @return The PluginRegistry shared instance
    */
-  PluginRegistry();
+  static PluginRegistry& getSharedInstance()
+  {
+    static PluginRegistry s_sharedInstance;
+    return s_sharedInstance;
+  }
 
   /**
    * Initializes the plugin registry.
@@ -53,6 +60,11 @@ public:
   void unloadOperationPlugin(std::string name, Operation *plugin);
 
 private:
+
+  /**
+   * Constructor.
+   */
+  PluginRegistry();
 
   /**
    * The plugin registry entries.
