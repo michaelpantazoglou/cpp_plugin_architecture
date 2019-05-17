@@ -1,7 +1,7 @@
 # C++ Plugin Architecture Demo
 
 ## Introduction
-This project implements the plugin architecture in the C++ programming language and demonstrates its use through a demo application.
+This project implements the plugin architecture in the C++ programming language. The plugin architecture usage is demonstrated through a simple calculator engine, which can be expanded with additional operations as plugins. The engine source code is originally shipped with two plugins: one for the addition operation, and another one for the subtraction operation.
 
 ## Build Instructions
 The project build has been tested in Ubuntu 16.04 LTS. 
