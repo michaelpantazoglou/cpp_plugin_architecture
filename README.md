@@ -53,7 +53,7 @@ Loading library libsubtraction_plugin.so
 Result: 1
 Enter operation: exit
 Calculator engine stopped
-Destruct plugin registry
+Clearing plugin registry
 ```
 
 ## Plugin Development
