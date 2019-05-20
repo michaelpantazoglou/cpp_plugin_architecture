@@ -6,7 +6,10 @@ add_library(${TARGET_NAME} SHARED
     "plugin_registry.cpp"
     "plugin_registry.h"
     "plugin_entry.cpp"
-    "plugin_entry.h")
+    "plugin_entry.h"
+    "plugin_utils.cpp"
+    "plugin_utils.h"
+)
 
 # all plugin libs MUST be installed in a specific directory
 set_target_properties(${TARGET_NAME}

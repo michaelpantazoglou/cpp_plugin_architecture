@@ -34,5 +34,7 @@ int main()
 
   calculatorEngine.stop();
 
+  pthread_exit(nullptr);
+
   return 0;
 }

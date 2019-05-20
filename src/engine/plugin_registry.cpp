@@ -1,14 +1,38 @@
 #include "plugin_registry.h"
-#include <dlfcn.h>
+#include "plugin_utils.h"
 #include <sys/types.h>
 #include <dirent.h>
 #include <iostream>
+
+/**
+ * The handle that is used to open, use, and close the plugin libraries.
+ */
+static void *lib = nullptr;
 
 /**
  * Constructor.
  */
 PluginRegistry::PluginRegistry()
 {
+}
+
+
+/**
+ * Destructor.
+ */
+PluginRegistry::~PluginRegistry()
+{
+  std::cout << "Destruct plugin registry" << std::endl;
+  std::map<std::string, std::map<std::string, PluginEntry*>>::const_iterator pluginType;
+  for (pluginType = m_entries.begin(); pluginType != m_entries.end(); ++pluginType) {
+    std::map<std::string, PluginEntry*> entries = pluginType->second;
+    std::map<std::string, PluginEntry*>::const_iterator pluginEntry;
+    for (pluginEntry = entries.begin(); pluginEntry != entries.end(); ++pluginEntry) {
+      delete pluginEntry->second;
+    }
+    entries.clear();
+  }
+  m_entries.clear();
 }
 
 
@@ -24,67 +48,50 @@ void PluginRegistry::initialize()
   DIR* dirp = opendir(pluginsDir.c_str());
   struct dirent * dp;
 
+  // Loop for each plugin library found at the specified folder
   while ((dp = readdir(dirp)) != nullptr) {
     std::string libname = dp->d_name;
 
-    // avoid '.' and '..' entries
+    // Make sure to avoid '.' and '..' entries
     if (libname == "." || libname == "..") {
       continue;
     }
 
     std::string fullpath = libname;
+    std::cout << "Attempting to open lib " << fullpath << " ..." << std::endl;
 
-    std::cout << "Attempting to dlopen lib " << fullpath << " ..." << std::endl;
-
-    void *lib = dlopen(fullpath.c_str(), RTLD_LAZY);
-    const char* dlsym_error = dlerror();
-    if (!lib) {
-      std::cerr << "Cannot open lib";
-      if (dlsym_error) {
-        std::cerr << ": " << dlsym_error;
-      }
-      std::cerr << std::endl;
+    // Open plugin library
+    void *lib = PluginUtils::OpenPluginLibrary(fullpath);
+    if (nullptr == lib) {
       continue;
     }
-
-    dlerror();
-
-    std::cout<< "Lib dlopened" << std::endl;
 
     // Create plugin instance in order to resolve its metadata.
-    createInstance_t *create = reinterpret_cast<createInstance_t *>(dlsym(lib, "create"));
-    dlsym_error = dlerror();
-    if (dlsym_error) {
-      std::cerr << "Cannot load symbol create: " << dlsym_error << std::endl;
-      dlclose(lib);
+    Operation *plugin = reinterpret_cast<Operation*>(PluginUtils::CreatePlugin(lib));
+    if (nullptr == plugin) {
+      PluginUtils::ClosePluginLibrary(lib);
       continue;
     }
-    create();
-    create = nullptr;
 
     // Resolve the plugin type
-    getType_t *getPluginType = reinterpret_cast<getType_t *>(dlsym(lib, "getType"));
-    dlsym_error = dlerror();
-    if (dlsym_error) {
-      std::cerr << "Cannot load symbol getType: " << dlsym_error << std::endl;
-      dlclose(lib);
+    std::string pluginType = PluginUtils::GetPluginType(lib);
+    if (pluginType.empty()) {
+      PluginUtils::ClosePluginLibrary(lib);
       continue;
     }
 
     // Resolve the plugin name
-    getName_t *getPluginName = reinterpret_cast<getName_t *>(dlsym(lib, "getName"));
-    dlsym_error = dlerror();
-    if (dlsym_error) {
-      std::cerr << "Cannot load symbol getName: " << dlsym_error << std::endl;
-      dlclose(lib);
+    std::string pluginName = PluginUtils::GetPluginName(lib);
+    if (pluginName.empty()) {
+      PluginUtils::ClosePluginLibrary(lib);
       continue;
     }
-    std::cout << "Got all required symbols" << std::endl;
 
-    std::string pluginType = getPluginType();
-    std::string pluginName = getPluginName();
+    // Destroy plugin instance
+    PluginUtils::DestroyPlugin(lib, plugin);
 
-    std::cout << "pluginType=" << pluginType << ", pluginName=" << pluginName << std::endl;
+    // Close plugin library
+    PluginUtils::ClosePluginLibrary(lib);
 
     // Create the corresponding plugin entry and populate its properties
     // Then, add the plugin entry to the registry
@@ -93,8 +100,9 @@ void PluginRegistry::initialize()
     m_entries[pluginType].insert(p);
 
     std::cout << "Added plugin (type=" << pluginType << ", name=" << pluginName << ")" << std::endl;
-    dlclose(lib);
   }
+
+  free(dp);
   closedir(dirp);
 }
 
@@ -121,7 +129,6 @@ PluginEntry *PluginRegistry::get(std::string type, std::string name)
  *
  * @return A pointer to the Operation plugin instance
  */
-void *lib = nullptr;
 Operation *PluginRegistry::loadOperationPlugin(std::string name)
 {
   // Sanity check that the plugin exists
@@ -130,29 +137,16 @@ Operation *PluginRegistry::loadOperationPlugin(std::string name)
     return nullptr;
   }
 
-  // dlopen plugin library
+  // Open plugin library
   std::cout << "Loading library " << pluginEntry->getLibName() << std::endl;
-  lib = dlopen(pluginEntry->getLibName().c_str(), RTLD_LAZY);
+  lib = PluginUtils::OpenPluginLibrary(pluginEntry->getLibName());
   if (!lib) {
-    std::cerr << "dlopen failed" << std::endl;
     return nullptr;
   }
 
-  // Create plugin instance
-  dlerror();
-  createInstance_t *create = reinterpret_cast<createInstance_t *>(dlsym(lib, "create"));
-  const char* dlsym_error = dlerror();
-  if (dlsym_error) {
-    std::cerr << "dlerror: " << dlsym_error << std::endl;
-    dlclose(lib);
-    return nullptr;
-  }
-  std::cout << "creating operation plugin instance" << std::endl;
-  Operation *plugin = create();
-  std::cout << "plugin instance successfully created" << std::endl;
-  
-  // Return plugin instance
-  return plugin;
+  // Create and return Operation plugin instance
+  void *plugin = PluginUtils::CreatePlugin(lib);
+  return reinterpret_cast<Operation*>(plugin);
 }
 
 
@@ -170,9 +164,6 @@ void PluginRegistry::unloadOperationPlugin(std::string name, Operation *plugin)
     return;
   }
   
-  // Call the destroy() method of the plugin and dlclose its previously dlopened library
-  destroyInstance_t *destroy = reinterpret_cast<destroyInstance_t *>(dlsym(lib, "destroy"));
-  dlerror();
-  destroy(plugin);
-  dlclose(lib);
+  PluginUtils::DestroyPlugin(lib, plugin);
+  PluginUtils::ClosePluginLibrary(lib);
 }

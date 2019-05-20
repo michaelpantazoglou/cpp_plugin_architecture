@@ -69,33 +69,15 @@ double CalculatorEngine::runOperation(std::string name, double operandA, double 
   if (!pluginEntry) {
     return -1;
   }
-  
-  // dlopen the plugin library
-  void *lib = dlopen(pluginEntry->getLibName().c_str(), RTLD_LAZY);
-  if (!lib) {
-    std::cerr << "dlopen failed" << std::endl;
-    return -1;
-  }
 
   // Create plugin instance
-  dlerror();
-  createInstance_t *create = reinterpret_cast<createInstance_t *>(dlsym(lib, "create"));
-  const char* dlsym_error = dlerror();
-  if (dlsym_error) {
-    std::cerr << "dlerror: " << dlsym_error << std::endl;
-    dlclose(lib);
-    return -1;
-  }
-  Operation *plugin = create();
-  
+  Operation *plugin = PluginRegistry::getSharedInstance().loadOperationPlugin(name);
+
   // Execute the plugin
   double result = plugin->execute(operandA, operandB);
 
-  // Destroy plugin and dlclose the plugin library
-  destroyInstance_t *destroy = reinterpret_cast<destroyInstance_t *>(dlsym(lib, "destroy"));
-  dlerror();
-  destroy(plugin);
-  dlclose(lib);
+  // Destroy plugin instance
+  PluginRegistry::getSharedInstance().unloadOperationPlugin(name, plugin);
 
   // Finally, return the operation result
   return result;

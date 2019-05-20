@@ -38,11 +38,4 @@ public:
   std::string version() { return "1.0"; }
 };
 
-// The following operation typedefs are used by the plugin registry to 
-// interact with the plugins through dlopen.
-typedef Operation *createInstance_t();
-typedef void destroyInstance_t(Operation*);
-typedef const char *getType_t();
-typedef const char *getName_t();
-
 #endif // OPERATION_H

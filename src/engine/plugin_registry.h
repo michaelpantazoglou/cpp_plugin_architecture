@@ -14,6 +14,11 @@ class PluginRegistry
 {
 
 public:
+
+  /**
+   * Destructor.
+   */
+  ~PluginRegistry();
   
   /**
    * (Signleton pattern)
