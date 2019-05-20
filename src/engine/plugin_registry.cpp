@@ -22,7 +22,7 @@ PluginRegistry::PluginRegistry()
  */
 PluginRegistry::~PluginRegistry()
 {
-  std::cout << "Destruct plugin registry" << std::endl;
+  std::cout << "Clearing plugin registry" << std::endl;
   std::map<std::string, std::map<std::string, PluginEntry*>>::const_iterator pluginType;
   for (pluginType = m_entries.begin(); pluginType != m_entries.end(); ++pluginType) {
     std::map<std::string, PluginEntry*> entries = pluginType->second;
