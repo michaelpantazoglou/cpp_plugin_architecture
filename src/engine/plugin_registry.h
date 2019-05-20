@@ -76,6 +76,11 @@ private:
    * The plugin registry entries.
    */
   std::map<std::string, std::map<std::string, PluginEntry*>> m_entries;
+
+  /**
+   * The map of plugin handles.
+   */
+  std::map<std::string, void*> m_pluginHandleMap;
 };
 
 #endif // PLUGIN_REGISTRY_H

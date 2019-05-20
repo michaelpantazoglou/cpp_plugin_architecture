@@ -5,11 +5,6 @@
 #include <iostream>
 
 /**
- * The handle that is used to open, use, and close the plugin libraries.
- */
-static void *lib = nullptr;
-
-/**
  * Constructor.
  */
 PluginRegistry::PluginRegistry()
@@ -33,6 +28,12 @@ PluginRegistry::~PluginRegistry()
     entries.clear();
   }
   m_entries.clear();
+
+  std::map<std::string, void*>::const_iterator handle;
+  for (handle = m_pluginHandleMap.begin(); handle != m_pluginHandleMap.end(); ++handle) {
+    PluginUtils::ClosePluginLibrary(handle->second);
+  }
+  m_pluginHandleMap.clear();
 }
 
 
@@ -132,6 +133,11 @@ PluginEntry *PluginRegistry::get(std::string type, std::string name)
  */
 void *PluginRegistry::loadPlugin(std::string type, std::string name)
 {
+  // Check if there is already a handle for this plugin type
+  if (nullptr != m_pluginHandleMap[type]) {
+    return m_pluginHandleMap[type];
+  }
+
   // Sanity check that the plugin exists
   PluginEntry *pluginEntry = get(type, name);
   if (!pluginEntry) {
@@ -140,10 +146,13 @@ void *PluginRegistry::loadPlugin(std::string type, std::string name)
 
   // Open plugin library
   std::cout << "Loading library " << pluginEntry->getLibName() << std::endl;
-  lib = PluginUtils::OpenPluginLibrary(pluginEntry->getLibName());
+  void *lib = PluginUtils::OpenPluginLibrary(pluginEntry->getLibName());
   if (!lib) {
     return nullptr;
   }
+
+  // Add handle to internal map for reuse
+  m_pluginHandleMap[type] = lib;
 
   // Create and return Operation plugin instance
   void *plugin = PluginUtils::CreatePlugin(lib);
@@ -166,6 +175,8 @@ void PluginRegistry::unloadPlugin(std::string type, std::string name, void *plug
     return;
   }
   
-  PluginUtils::DestroyPlugin(lib, plugin);
-  PluginUtils::ClosePluginLibrary(lib);
+  PluginUtils::DestroyPlugin(m_pluginHandleMap[type], plugin);
+  PluginUtils::ClosePluginLibrary(m_pluginHandleMap[type]);
+
+  m_pluginHandleMap.erase(m_pluginHandleMap.find(type));
 }
