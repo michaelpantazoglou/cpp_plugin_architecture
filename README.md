@@ -34,29 +34,26 @@ While in build directory, type:
 The following is an example of the input and output of the calculator application:
 
 ```
-Attempting to dlopen lib libsubtraction_plugin.so ...
-Lib dlopened
-Got all required symbols
-pluginType=operation, pluginName=sub
+Attempting to open lib libsubtraction_plugin.so ...
 Added plugin (type=operation, name=sub)
-Attempting to dlopen lib libaddition_plugin.so ...
-Lib dlopened
-Got all required symbols
-pluginType=operation, pluginName=add
+Attempting to open lib libaddition_plugin.so ...
 Added plugin (type=operation, name=add)
 Calculator engine started
 Enter operation: add
 operandA: 1
 operandB: 2
+Loading library libaddition_plugin.so
 Result: 3
-Enter operation: multiply
+Enter operation: mul
 Operation not supported
-Enter operation: sub     
-operandA: 1
-operandB: 4565
-Result: -4564
+Enter operation: sub
+operandA: 4
+operandB: 3
+Loading library libsubtraction_plugin.so
+Result: 1
 Enter operation: exit
 Calculator engine stopped
+Destruct plugin registry
 ```
 
 ## Plugin Development
