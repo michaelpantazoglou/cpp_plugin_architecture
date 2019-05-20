@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 #include "plugin_entry.h"
-#include "operation.h"
 
 /**
  * Implements the plugin registry, which is used to register, discover, and 
@@ -48,21 +47,23 @@ public:
   PluginEntry *get(std::string type, std::string name);
 
   /**
-   * Loads the specified operation plugin.
+   * Loads the specified plugin.
    *
-   * @param name The operation plugin name
+   * @param type The plugin type
+   * @param name The plugin name
    *
-   * @return A pointer to the Operation plugin instance
+   * @return A pointer to the plugin instance
    */
-  Operation *loadOperationPlugin(std::string name);
+  void *loadPlugin(std::string type, std::string name);
 
   /**
    * Unloads the specified plugin.
    *
-   * @param name The plugin nam
+   * @param type The plugin type
+   * @param name The plugin name
    * @param plugin Pointer to the plugin instance
    */
-  void unloadOperationPlugin(std::string name, Operation *plugin);
+  void unloadPlugin(std::string type, std::string name, void *plugin);
 
 private:
 

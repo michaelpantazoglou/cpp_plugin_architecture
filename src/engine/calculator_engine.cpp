@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <dlfcn.h>
 
+#define PLUGIN_OPERATION "operation"
+
 using namespace std;
 
 /**
@@ -43,7 +45,7 @@ void CalculatorEngine::stop()
  */
 bool CalculatorEngine::isOperationSupported(std::string name)
 {
-  PluginEntry *pluginEntry = PluginRegistry::getSharedInstance().get("operation", name);
+  PluginEntry *pluginEntry = PluginRegistry::getSharedInstance().get(PLUGIN_OPERATION, name);
   if (!pluginEntry) {
     return false;
   }
@@ -65,19 +67,19 @@ bool CalculatorEngine::isOperationSupported(std::string name)
 double CalculatorEngine::runOperation(std::string name, double operandA, double operandB)
 {
   // Discover the requested operation plugin by name
-  PluginEntry *pluginEntry = PluginRegistry::getSharedInstance().get("operation", name);
+  PluginEntry *pluginEntry = PluginRegistry::getSharedInstance().get(PLUGIN_OPERATION, name);
   if (!pluginEntry) {
     return -1;
   }
 
   // Create plugin instance
-  Operation *plugin = PluginRegistry::getSharedInstance().loadOperationPlugin(name);
+  Operation *plugin = reinterpret_cast<Operation*>(PluginRegistry::getSharedInstance().loadPlugin(PLUGIN_OPERATION, name));
 
   // Execute the plugin
   double result = plugin->execute(operandA, operandB);
 
   // Destroy plugin instance
-  PluginRegistry::getSharedInstance().unloadOperationPlugin(name, plugin);
+  PluginRegistry::getSharedInstance().unloadPlugin(PLUGIN_OPERATION, name, plugin);
 
   // Finally, return the operation result
   return result;

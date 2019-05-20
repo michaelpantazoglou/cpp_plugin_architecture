@@ -123,16 +123,17 @@ PluginEntry *PluginRegistry::get(std::string type, std::string name)
 
 
 /**
- * Loads the specified operation plugin.
+ * Loads the specified plugin.
  *
- * @param name The operation plugin name
+ * @param type The plugin type
+ * @param name The plugin name
  *
- * @return A pointer to the Operation plugin instance
+ * @return A pointer to the plugin instance
  */
-Operation *PluginRegistry::loadOperationPlugin(std::string name)
+void *PluginRegistry::loadPlugin(std::string type, std::string name)
 {
   // Sanity check that the plugin exists
-  PluginEntry *pluginEntry = get("operation", name);
+  PluginEntry *pluginEntry = get(type, name);
   if (!pluginEntry) {
     return nullptr;
   }
@@ -146,20 +147,21 @@ Operation *PluginRegistry::loadOperationPlugin(std::string name)
 
   // Create and return Operation plugin instance
   void *plugin = PluginUtils::CreatePlugin(lib);
-  return reinterpret_cast<Operation*>(plugin);
+  return plugin;
 }
 
 
 /**
  * Unloads the specified plugin.
  *
- * @param name The plugin nam
+ * @param type The plugin type
+ * @param name The plugin name
  * @param plugin Pointer to the plugin instance
  */
-void PluginRegistry::unloadOperationPlugin(std::string name, Operation *plugin)
+void PluginRegistry::unloadPlugin(std::string type, std::string name, void *plugin)
 {
   // Sanity check that the plugin exists
-  PluginEntry *pluginEntry = get("operation", name);
+  PluginEntry *pluginEntry = get(type, name);
   if (!pluginEntry) {
     return;
   }
