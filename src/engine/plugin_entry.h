@@ -2,7 +2,6 @@
 #define PLUGIN_ENTRY_H
 
 #include <string>
-#include "operation.h"
 
 /**
  * This class is used to represent a plugin within the plugin registry.
