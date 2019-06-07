@@ -1,5 +1,6 @@
 #include "calculator_engine.h"
 #include "plugin_registry.h"
+#include "operation.h"
 #include <iostream>
 #include <assert.h>
 #include <dlfcn.h>
