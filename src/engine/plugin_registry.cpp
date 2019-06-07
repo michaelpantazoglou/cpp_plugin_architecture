@@ -47,6 +47,11 @@ void PluginRegistry::initialize()
   std::string homeDir(getenv("HOME"));
   std::string pluginsDir = homeDir + "/Desktop/calculator_engine/plugins";
   DIR* dirp = opendir(pluginsDir.c_str());
+  if (NULL == dirp) {
+    std::cerr << "Could not open directory: " << pluginsDir << std::endl;
+    return;
+  }
+  
   struct dirent * dp;
 
   // Loop for each plugin library found at the specified folder
