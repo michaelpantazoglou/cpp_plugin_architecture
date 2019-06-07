@@ -73,7 +73,7 @@ void PluginRegistry::initialize()
     }
 
     // Create plugin instance in order to resolve its metadata.
-    Operation *plugin = reinterpret_cast<Operation*>(PluginUtils::CreatePlugin(lib));
+    void *plugin = PluginUtils::CreatePlugin(lib);
     if (nullptr == plugin) {
       PluginUtils::ClosePluginLibrary(lib);
       continue;
