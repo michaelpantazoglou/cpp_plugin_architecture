@@ -14,8 +14,8 @@ target_include_directories(${TARGET_NAME} PRIVATE
 )
 
 target_link_libraries(${TARGET_NAME}
-    "-Wl,-rpath=$ENV{HOME}/Desktop/calculator_engine/plugins/"
-    "-Wl,-rpath=$ENV{HOME}/Desktop/calculator_engine/lib/"
+    "-Wl,-rpath=$ENV{HOME}/Desktop/calculator/plugins"
+    "-Wl,-rpath=$ENV{HOME}/Desktop/calculator/lib"
     "engine"
     "api"
 )
@@ -25,6 +25,6 @@ add_subdirectory("src/engine")
 add_subdirectory("src/plugin_addition")
 add_subdirectory("src/plugin_subtraction")
 
-file(MAKE_DIRECTORY "$ENV{HOME}/Desktop/calculator_engine/")
+file(MAKE_DIRECTORY "$ENV{HOME}/Desktop/calculator")
 
 set(CMAKE_CXX_FLAGS "-std=gnu++11 ${CMAKE_CXX_FLAGS}")

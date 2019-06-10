@@ -74,13 +74,13 @@ double CalculatorEngine::runOperation(std::string name, double operandA, double 
   }
 
   // Create plugin instance
-  Operation *plugin = reinterpret_cast<Operation*>(PluginRegistry::getSharedInstance().loadPlugin(PLUGIN_OPERATION, name));
+  Operation *plugin = reinterpret_cast<Operation*>(PluginRegistry::getSharedInstance().loadPlugin(pluginEntry));
 
   // Execute the plugin
   double result = plugin->execute(operandA, operandB);
 
   // Destroy plugin instance
-  PluginRegistry::getSharedInstance().unloadPlugin(PLUGIN_OPERATION, name, plugin);
+  PluginRegistry::getSharedInstance().unloadPlugin(pluginEntry, plugin);
 
   // Finally, return the operation result
   return result;

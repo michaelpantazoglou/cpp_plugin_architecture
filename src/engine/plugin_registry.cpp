@@ -5,6 +5,12 @@
 #include <iostream>
 
 /**
+ * This is where the plugin registry expects to find the solidMediaEngine 
+ * plugins. Each plugin corresponds to a .so file located under this directory.
+ */
+#define PLUGINS_HOMEDIR "/home/michaelp/Desktop/calculator/plugins"
+
+/**
  * Constructor.
  */
 PluginRegistry::PluginRegistry()
@@ -44,17 +50,17 @@ void PluginRegistry::initialize()
 {
   // By convention, the plugin registry expects that all plugin .so libraries 
   // are located under the specified folder
-  std::string homeDir(getenv("HOME"));
-  std::string pluginsDir = homeDir + "/Desktop/calculator_engine/plugins";
+  std::string pluginsDir = PLUGINS_HOMEDIR;
   DIR* dirp = opendir(pluginsDir.c_str());
   if (NULL == dirp) {
     std::cerr << "Could not open directory: " << pluginsDir << std::endl;
     return;
   }
-  
+
   struct dirent * dp;
 
   // Loop for each plugin library found at the specified folder
+  std::cout << "Traversing directory " << pluginsDir << std::endl;
   while ((dp = readdir(dirp)) != nullptr) {
     std::string libname = dp->d_name;
 
@@ -131,22 +137,23 @@ PluginEntry *PluginRegistry::get(std::string type, std::string name)
 /**
  * Loads the specified plugin.
  *
- * @param type The plugin type
- * @param name The plugin name
+ * @param pluginEntry Pointer to the corresponding plugin entry
  *
  * @return A pointer to the plugin instance
  */
-void *PluginRegistry::loadPlugin(std::string type, std::string name)
+void *PluginRegistry::loadPlugin(PluginEntry *pluginEntry)
 {
-  // Check if there is already a handle for this plugin type
-  if (nullptr != m_pluginHandleMap[type]) {
-    return m_pluginHandleMap[type];
+  if (nullptr == pluginEntry) {
+    return nullptr;
   }
 
-  // Sanity check that the plugin exists
-  PluginEntry *pluginEntry = get(type, name);
-  if (!pluginEntry) {
-    return nullptr;
+  std::string name = pluginEntry->getName();
+  std::string type = pluginEntry->getType();
+  std::string pluginId = type + "::" + name;
+
+  // Check if there is already a handle for this plugin
+  if (nullptr != m_pluginHandleMap[pluginId]) {
+    return m_pluginHandleMap[pluginId];
   }
 
   // Open plugin library
@@ -156,11 +163,13 @@ void *PluginRegistry::loadPlugin(std::string type, std::string name)
     return nullptr;
   }
 
-  // Add handle to internal map for reuse
-  m_pluginHandleMap[type] = lib;
-
   // Create and return Operation plugin instance
   void *plugin = PluginUtils::CreatePlugin(lib);
+
+  // Add handles to internal maps for reuse
+  m_pluginHandleMap[pluginId] = plugin;
+  m_pluginLibMap[pluginId] = lib;
+
   return plugin;
 }
 
@@ -168,20 +177,24 @@ void *PluginRegistry::loadPlugin(std::string type, std::string name)
 /**
  * Unloads the specified plugin.
  *
- * @param type The plugin type
- * @param name The plugin name
+ * @param pluginEntry Pointer to the corresponding plugin entry
  * @param plugin Pointer to the plugin instance
  */
-void PluginRegistry::unloadPlugin(std::string type, std::string name, void *plugin)
+void PluginRegistry::unloadPlugin(PluginEntry *pluginEntry, void *plugin)
 {
-  // Sanity check that the plugin exists
-  PluginEntry *pluginEntry = get(type, name);
   if (!pluginEntry) {
     return;
   }
-  
-  PluginUtils::DestroyPlugin(m_pluginHandleMap[type], plugin);
-  PluginUtils::ClosePluginLibrary(m_pluginHandleMap[type]);
 
-  m_pluginHandleMap.erase(m_pluginHandleMap.find(type));
+  std::string name = pluginEntry->getName();
+  std::string type = pluginEntry->getType();
+  std::string pluginId = type + "::" + name;
+  
+  PluginUtils::DestroyPlugin(m_pluginLibMap[pluginId], plugin);
+  PluginUtils::ClosePluginLibrary(m_pluginLibMap[pluginId]);
+
+  m_pluginHandleMap.erase(m_pluginHandleMap.find(pluginId));
+  m_pluginLibMap.erase(m_pluginLibMap.find(pluginId));
+
+  std::cout << "Plugin with id = " << pluginId << " successfully unloaded" << std::endl;
 }

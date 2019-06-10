@@ -49,21 +49,19 @@ public:
   /**
    * Loads the specified plugin.
    *
-   * @param type The plugin type
-   * @param name The plugin name
+   * @param pluginEntry Pointer to the corresponding plugin entry
    *
    * @return A pointer to the plugin instance
    */
-  void *loadPlugin(std::string type, std::string name);
+  void *loadPlugin(PluginEntry *pluginEntry);
 
   /**
    * Unloads the specified plugin.
    *
-   * @param type The plugin type
-   * @param name The plugin name
+   * @param pluginEntry Pointer to the corresponding plugin entry
    * @param plugin Pointer to the plugin instance
    */
-  void unloadPlugin(std::string type, std::string name, void *plugin);
+  void unloadPlugin(PluginEntry *pluginEntry, void *plugin);
 
 private:
 
@@ -81,6 +79,11 @@ private:
    * The map of plugin handles.
    */
   std::map<std::string, void*> m_pluginHandleMap;
+
+  /**
+   * The map of plugin lib handles.
+   */
+  std::map<std::string, void*> m_pluginLibMap;
 };
 
 #endif // PLUGIN_REGISTRY_H
