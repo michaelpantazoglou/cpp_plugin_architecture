@@ -17,7 +17,9 @@ set_target_properties(${TARGET_NAME}
     LIBRARY_OUTPUT_DIRECTORY "$ENV{HOME}/Desktop/calculator/lib")
 
 target_include_directories(${TARGET_NAME} PRIVATE
-    "../api")
+    "../api"
+    "../json"
+)
 
 target_link_libraries(${TARGET_NAME}
     "dl"

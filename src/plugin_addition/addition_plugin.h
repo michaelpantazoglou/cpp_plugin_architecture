@@ -37,12 +37,6 @@ public:
 // plugin metadata. They are called via dlopen.
 
 extern "C"
-const char *getType()
-{
-  return "operation";
-}
-
-extern "C"
 const char *getName()
 {
   return "add";

@@ -4,6 +4,9 @@
 #include <iostream>
 #include <assert.h>
 #include <dlfcn.h>
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 #define PLUGIN_OPERATION "operation"
 
@@ -77,7 +80,13 @@ double CalculatorEngine::runOperation(std::string name, double operandA, double 
   Operation *plugin = reinterpret_cast<Operation*>(PluginRegistry::getSharedInstance().loadPlugin(pluginEntry));
 
   // Execute the plugin
-  double result = plugin->execute(operandA, operandB);
+  //double result = plugin->execute(operandA, operandB);
+
+  json input;
+  input["operandA"] = operandA;
+  input["operandB"] = operandB;
+  json output = plugin->invokeMethod("execute", input);
+  double result = output["result"].get<double>();
 
   // Destroy plugin instance
   PluginRegistry::getSharedInstance().unloadPlugin(pluginEntry, plugin);

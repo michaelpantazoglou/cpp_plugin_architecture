@@ -8,7 +8,10 @@ add_library(${TARGET_NAME} SHARED
 
 #add_dependencies(${TARGET_NAME} api)
 
-target_include_directories(${TARGET_NAME} PRIVATE "../api")
+target_include_directories(${TARGET_NAME} PRIVATE 
+  "../api"
+  "../json"
+  )
 
 # all plugin libs MUST be installed in a specific directory
 set_target_properties(${TARGET_NAME}
