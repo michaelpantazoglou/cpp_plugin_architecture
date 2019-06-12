@@ -80,16 +80,16 @@ double CalculatorEngine::runOperation(std::string name, double operandA, double 
   Operation *plugin = reinterpret_cast<Operation*>(PluginRegistry::getSharedInstance().loadPlugin(pluginEntry));
 
   // Execute the plugin
-  //double result = plugin->execute(operandA, operandB);
-
+  double result = plugin->execute(operandA, operandB);
+#if 0
   json input;
   input["operandA"] = operandA;
   input["operandB"] = operandB;
   json output = plugin->invokeMethod("execute", input);
   double result = output["result"].get<double>();
-
+#endif
   // Destroy plugin instance
-  PluginRegistry::getSharedInstance().unloadPlugin(pluginEntry, plugin);
+  PluginRegistry::getSharedInstance().unloadPlugin(pluginEntry);
 
   // Finally, return the operation result
   return result;

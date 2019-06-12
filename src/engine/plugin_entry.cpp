@@ -24,6 +24,17 @@ PluginEntry::~PluginEntry()
 
 
 /**
+ * Gets the plugin id, which is a derived property.
+ * 
+ * @return The plugin id
+ */
+std::string PluginEntry::getId() const
+{
+  return m_type + "::" + m_name;
+}
+
+
+/**
  * Gets the plugin type.
  *
  * @return The plugin type

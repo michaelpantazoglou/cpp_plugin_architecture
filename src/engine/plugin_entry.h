@@ -25,6 +25,13 @@ public:
   ~PluginEntry();
 
   /**
+   * Gets the plugin id, which is a derived property.
+   * 
+   * @return The plugin id
+   */
+  std::string getId() const;
+
+  /**
    * Gets the plugin type.
    *
    * @return The plugin type

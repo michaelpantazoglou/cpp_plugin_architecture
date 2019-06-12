@@ -59,9 +59,8 @@ public:
    * Unloads the specified plugin.
    *
    * @param pluginEntry Pointer to the corresponding plugin entry
-   * @param plugin Pointer to the plugin instance
    */
-  void unloadPlugin(PluginEntry *pluginEntry, void *plugin);
+  void unloadPlugin(PluginEntry *pluginEntry);
 
 private:
 

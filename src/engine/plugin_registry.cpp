@@ -27,19 +27,14 @@ PluginRegistry::~PluginRegistry()
   std::map<std::string, std::map<std::string, PluginEntry*>>::const_iterator pluginType;
   for (pluginType = m_entries.begin(); pluginType != m_entries.end(); ++pluginType) {
     std::map<std::string, PluginEntry*> entries = pluginType->second;
-    std::map<std::string, PluginEntry*>::const_iterator pluginEntry;
-    for (pluginEntry = entries.begin(); pluginEntry != entries.end(); ++pluginEntry) {
-      delete pluginEntry->second;
+    std::map<std::string, PluginEntry*>::const_iterator pluginEntryIter;
+    for (pluginEntryIter = entries.begin(); pluginEntryIter != entries.end(); ++pluginEntryIter) {
+      unloadPlugin(pluginEntryIter->second);
+      delete pluginEntryIter->second;
     }
     entries.clear();
   }
   m_entries.clear();
-
-  std::map<std::string, void*>::const_iterator handle;
-  for (handle = m_pluginHandleMap.begin(); handle != m_pluginHandleMap.end(); ++handle) {
-    PluginUtils::ClosePluginLibrary(handle->second);
-  }
-  m_pluginHandleMap.clear();
 }
 
 
@@ -147,9 +142,7 @@ void *PluginRegistry::loadPlugin(PluginEntry *pluginEntry)
     return nullptr;
   }
 
-  std::string name = pluginEntry->getName();
-  std::string type = pluginEntry->getType();
-  std::string pluginId = type + "::" + name;
+  std::string pluginId = pluginEntry->getId();
 
   // Check if there is already a handle for this plugin
   if (nullptr != m_pluginHandleMap[pluginId]) {
@@ -178,23 +171,27 @@ void *PluginRegistry::loadPlugin(PluginEntry *pluginEntry)
  * Unloads the specified plugin.
  *
  * @param pluginEntry Pointer to the corresponding plugin entry
- * @param plugin Pointer to the plugin instance
  */
-void PluginRegistry::unloadPlugin(PluginEntry *pluginEntry, void *plugin)
+void PluginRegistry::unloadPlugin(PluginEntry *pluginEntry)
 {
   if (!pluginEntry) {
-    return;
+      return;
   }
 
-  std::string name = pluginEntry->getName();
-  std::string type = pluginEntry->getType();
-  std::string pluginId = type + "::" + name;
-  
-  PluginUtils::DestroyPlugin(m_pluginLibMap[pluginId], plugin);
-  PluginUtils::ClosePluginLibrary(m_pluginLibMap[pluginId]);
+  std::string pluginId = pluginEntry->getId();
 
-  m_pluginHandleMap.erase(m_pluginHandleMap.find(pluginId));
-  m_pluginLibMap.erase(m_pluginLibMap.find(pluginId));
+  void *plugin = m_pluginHandleMap[pluginId];
+  void *lib = m_pluginLibMap[pluginId];
+
+  if (nullptr != lib) {
+    if (nullptr != plugin) {
+      PluginUtils::DestroyPlugin(lib, plugin);
+      m_pluginHandleMap.erase(m_pluginHandleMap.find(pluginId));
+    }
+
+    PluginUtils::ClosePluginLibrary(lib);
+    m_pluginLibMap.erase(m_pluginLibMap.find(pluginId));
+  }
 
   std::cout << "Plugin with id = " << pluginId << " successfully unloaded" << std::endl;
 }
