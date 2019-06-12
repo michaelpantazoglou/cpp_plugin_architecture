@@ -191,7 +191,6 @@ void PluginRegistry::unloadPlugin(PluginEntry *pluginEntry)
 
     PluginUtils::ClosePluginLibrary(lib);
     m_pluginLibMap.erase(m_pluginLibMap.find(pluginId));
+    std::cout << "Plugin with id = " << pluginId << " successfully unloaded" << std::endl;
   }
-
-  std::cout << "Plugin with id = " << pluginId << " successfully unloaded" << std::endl;
 }
