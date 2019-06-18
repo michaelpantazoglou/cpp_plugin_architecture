@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include "plugin_entry.h"
 
 /**
@@ -45,6 +46,14 @@ public:
    * @return A plugin entry corresponding to the dicsovered plugin, or nullptr
    */
   PluginEntry *get(std::string type, std::string name);
+
+  /**
+   * Gets all registered plugin entries.
+   *
+   * @return A vector that contains pointers to the PluginEntry instances
+   *         corresponding to the registered plugins
+   */
+  std::vector<PluginEntry*> getAll();
 
   /**
    * Loads the specified plugin.

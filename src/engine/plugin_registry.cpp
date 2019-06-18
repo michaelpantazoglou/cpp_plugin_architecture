@@ -130,6 +130,25 @@ PluginEntry *PluginRegistry::get(std::string type, std::string name)
 
 
 /**
+ * Gets all registered plugin entries.
+ *
+ * @return A vector that contains pointers to the PluginEntry instances
+ *         corresponding to the registered plugins
+ */
+std::vector<PluginEntry*> PluginRegistry::getAll()
+{
+  std::vector<PluginEntry*> result;
+  for (auto element : m_entries) {
+    std::map<std::string, PluginEntry*> map = element.second;
+    for (auto entry : map) {
+      result.push_back(entry.second);
+    }
+  }
+  return result;
+}
+
+
+/**
  * Loads the specified plugin.
  *
  * @param pluginEntry Pointer to the corresponding plugin entry
